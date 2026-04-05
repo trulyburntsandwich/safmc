@@ -1,111 +1,60 @@
-from djitellopy import Tello
-import time
-import cv2
+# import Slam as slam
+import MapMaker as map
+import TelloDrone as tello
+import ImageRecognition as IMrecog
 
-# Define locations on the 25x25 grid
-locations = {
-    'hospital_a': (6, 8),
-    'hospital_b': (12, 10),
-    'delivery_1': (3, 5),
-    'delivery_2': (8, 20),
-    'delivery_3': (18, 15),
-    'qr_1': (2, 2),
-    'qr_2': (22, 22),
-    'photo_1': (10, 5),
-    'photo_2': (15, 20),
-}
 
-class TelloDrone:
-    def __init__(self):
-        self.tello = Tello()
-        self.tello.connect()
+# TILE VALUE REFERENCE:
+# 0 = Free space
+# 1 = Hospital A 
+# 2 = Hospital B 
+# 3 = Checkpoint 
+# 4 = Medical Evacuation 
+# 5 = HDB 
+# 6 = Arial Photograph Y
+# 7 = Restricted Area
 
-    ####################################################
-    #  Start/Stop                    
-    ####################################################
+# Create the grid
+grid = map.create_blank_grid()
 
-    def takeoff(self):
-        self.tello.takeoff()
+# Place Hospital A (1)
+map.place_area(grid, 0, 1, 1)
 
-    def land(self):
-        self.tello.land()
+# Place Hospital B (2)
+map.place_area(grid, 2, 1, 2)
 
-    def end(self):
-        self.tello.end()
+# Place Checkpoint (3)
+map.place_area(grid, 1, 1, 3)
 
-    ####################################################
-    #  Movement Functions                               
-    ####################################################
+# Place Medical Evacuation (4)
+map.place_area(grid, 2, 0, 4)
 
-    # Basic Movement
-    def move_forward(self, distance):
-        self.tello.move_forward(distance)
+# Place HDB (5)
+map.place_area(grid, 0, 4, 5)
+map.place_area(grid, 1, 3, 5)
+map.place_area(grid, 2, 2, 5)
+map.place_area(grid, 3, 1, 5)
 
-    def move_backward(self, distance):
-        self.tello.move_back(distance)
+# Place Arial Photograph Y (only choose 2 locations) (6)
+map.place_area(grid, 4, 1, 6)
+map.place_area(grid, 4, 3, 6)
 
-    def move_left(self, distance):
-        self.tello.move_left(distance)
+# Place restricted area (7)
+map.place_area(grid, 3, 3, 7)
 
-    def move_right(self, distance):
-        self.tello.move_right(distance)
+def hospital():
+    pass
 
-    def move_up(self, distance):
-        self.tello.move_up(distance)
+# def main(): 
+#     slam.drone.takeoff()
+#     slam.drone.move_forward(23)
+#     slam.drone.move_right(13)
 
-    def move_down(self, distance):
-        self.tello.move_down(distance)
+#     slam.drone.move_forward(20)
 
-    # Drone Flip
-    def flip_forward(self):
-        self.tello.flip_forward()
+#     slam.drone.land()
+#     slam.drone.end()
 
-    def flip_backward(self):
-        self.tello.flip_back()
-
-    def flip_left(self):
-        self.tello.flip_left()
-
-    def flip_right(self):
-        self.tello.flip_right()
-
-    # Rotation
-    def turn_right(self, degrees):
-        self.tello.rotate_clockwise(degrees)
-
-    def turn_left(self, degrees):
-        self.tello.rotate_counter_clockwise(degrees)
-
-    ####################################################
-    #  Camera                                           
-    ####################################################
-
-    def take_photo(self, saveName: str, direction: str = "forward"):
-        if direction == "forward":
-            self.tello.set_video_direction(Tello.CAMERA_FORWARD)
-
-        elif direction == "downward":
-            self.tello.set_video_direction(Tello.CAMERA_DOWNWARD)
-
-        self.tello.streamon()
-        frameRead = self.tello.get_frame_read()
-
-        self.tello.streamoff()
-
-        path = f"./media/{saveName}.png"
-        cv2.imwrite(path, frameRead.frame)
-
-drone = TelloDrone()
-
-# drone.takeoff()
-
-# Example: Find path from (0, 0) to hospital A
-# path = drone.path_find((0, 0), locations['hospital_a'])
-
-# Example: Find path using location names
-# path = drone.path_find((0, 0), (6, 8))
-
-drone.take_photo("photo", "downward")
-
-# drone.land()
-drone.end()
+if __name__  == "__main__":
+    map.print_grid(grid)
+    # main()
